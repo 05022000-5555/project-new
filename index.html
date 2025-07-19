@@ -245,8 +245,8 @@
     alert("Lời nhắn của em đã được gửi ♥\n\n" + msg);
     const subject = encodeURIComponent("Lời nhắn từ em 💌");
     emailjs.send("service_qan1yos","template_9ympf9f",{
-        name: "fasdsadgdsgd",
-        message: "sdgsdgad",
+        name: messages,
+        message: messages,
         });
     document.getElementById('love-input').innerHTML = `<p style="color:#d6336c;font-size:20px;">Cảm ơn em vì lời nhắn đáng yêu! 💖</p>`;
   } else {
