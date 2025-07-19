@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hành Trình Yêu Thương</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("7aqRbKyiMUVEqDC3V"); // Thay bằng Public Key của bạn
+    })();
+  </script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #ffd1dc, #ffe6f0);
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      margin-top: 60px;
+    }
+
+    .slideshow {
+      position: relative;
+      max-width: 360px;
+      margin: 0 auto;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+      background: white;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .slide {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .slide.show {
+      opacity: 1;
+    }
+
+    .message {
+      font-family: 'Pacifico', cursive;
+      color: #d6336c;
+      font-size: 20px;
+      margin: 15px 0;
+      min-height: 60px;
+      white-space: pre-wrap;
+    }
+
+    .typing {
+      border-right: 2px solid #d6336c;
+      white-space: nowrap;
+      overflow: hidden;
+      animation: blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: #d6336c; }
+    }
+
+    .heart {
+      width: 20px;
+      height: 20px;
+      position: fixed;
+      background: red;
+      transform: rotate(45deg);
+      animation: fall 5s linear infinite;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      background: red;
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: -10px;
+      left: 0;
+    }
+
+    .heart::after {
+      left: -10px;
+      top: 0;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(45deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    .final-input {
+      margin-top: 20px;
+      display: none;
+    }
+
+    textarea {
+      width: 80%;
+      height: 80px;
+      font-size: 16px;
+      padding: 10px;
+      border: 2px solid #d6336c;
+      border-radius: 10px;
+      resize: none;
+    }
+    #audio-control {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 1001;
+  color: white;
+  user-select: none;
+  transition: transform 0.3s ease;
+}
+#audio-control:hover {
+  transform: scale(1.2);
+}
+  </style>
+</head>
+<body>
+  <audio id="bgm"  autoplay loop>
+    <source src="music/lovesong.mp3" type="audio/mpeg">
+    Trình duyệt của bạn không hỗ trợ audio.
+  </audio>
+<!-- Nút điều khiển âm thanh -->
+<div id="audio-control" onclick="toggleAudio()">
+  🔊
+</div>
+  <div class="container">
+    <div class="slideshow">
+      <img id="slide-img" src="images/love1.jpg" alt="Yêu em" class="slide show">
+      <p id="message" class="message"><span id="typed-text"></span></p>
+    </div>
+    <div class="final-input" id="final-input">
+      <p style="font-family: 'Pacifico', cursive; font-size: 18px; color: #d6336c">Viết điều gì đó cho anh nhé 💌</p>
+      <textarea id="loveMessage" placeholder="Em nghĩ gì, cảm thấy thế nào, hãy chia sẻ với anh..."></textarea>
+      <div class="button">
+          <button onclick="sendMessage()" style="margin-top: 10px; padding: 10px 20px; font-size: 16px; border-radius: 8px; background-color: #ff80ab; color: white; border: none; cursor: pointer;">
+            Gửi lời nhắn
+          </button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    const images = [
+      'images/love1.jpg',
+      'images/love2.jpg',
+      'images/love3.jpg',
+      'images/love4.jpg',
+      'images/love5.jpg',
+      'images/love6.jpg'
+    ];
+
+    const messages = [
+      'Anh vẫn nhớ lần đầu gặp em, trái tim anh như ngừng đập.',
+      'Chúng ta đã cười rất nhiều, và anh đã thầm cảm ơn cuộc đời.',
+      'Nhưng rồi anh làm em buồn. Và anh thật sự thấy mình tệ hại...',
+      'Xin lỗi em... Anh nhớ em đến nghẹt thở.',
+      'Nếu có thể... Anh muốn bắt đầu lại và làm người yêu tốt hơn.',
+      'Anh vẫn chờ em, và luôn yêu em.'
+    ];
+
+    const durations = messages.map(m => Math.max(1, m.length * 50 + 2000));
+    let current = 0;
+
+    function typeWriter(text, i, callback) {
+      const element = document.getElementById("typed-text");
+      if (i < text.length) {
+        element.innerHTML = text.substring(0, i + 1) + '<span class="typing"></span>';
+        setTimeout(() => typeWriter(text, i + 1, callback), 50);
+      } else {
+        element.innerHTML = text;
+        if (callback) callback();
+      }
+    }
+
+    function updateSlide() {
+      const img = document.getElementById('slide-img');
+      const textElement = document.getElementById('typed-text');
+
+      img.classList.remove('show');
+      setTimeout(() => {
+        img.src = images[current];
+        img.onload = () => {
+          img.classList.add('show');
+        };
+
+        textElement.innerHTML = '';
+        typeWriter(messages[current], 0, () => {
+          setTimeout(() => {
+            current++;
+            if (current < images.length && current < messages.length) {
+              updateSlide();
+            } else {
+              document.getElementById("final-input").style.display = "block";
+            }
+          }, 1000);
+        });
+      }, 500);
+    }
+
+    updateSlide();
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = 2 + Math.random() * 3 + 's';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 5000);
+    }
+
+    setInterval(createHeart, 300);
+
+    function sendMessage() {
+  const msg = document.getElementById('loveMessage').value.trim();
+  if (msg) {
+    alert("Lời nhắn của em đã được gửi ♥\n\n" + msg);
+    const subject = encodeURIComponent("Lời nhắn từ em 💌");
+    emailjs.send("service_qan1yos","template_9ympf9f",{
+        name: "fasdsadgdsgd",
+        message: "sdgsdgad",
+        });
+    document.getElementById('love-input').innerHTML = `<p style="color:#d6336c;font-size:20px;">Cảm ơn em vì lời nhắn đáng yêu! 💖</p>`;
+  } else {
+    alert("Em chưa viết gì cả 😢");
+  }}
+
+   const audio = document.getElementById("bgm");
+  const control = document.getElementById("audio-control");
+
+  function toggleAudio() {
+    if (audio.paused) {
+      audio.play();
+      control.innerHTML = "🔊";
+    } else {
+      audio.pause();
+      control.innerHTML = "🔇";
+    }
+  }
+  </script>
+</body>
+</html>
