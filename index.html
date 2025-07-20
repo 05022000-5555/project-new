@@ -298,10 +298,10 @@
   if (msg) {
     showPopup("Lời nhắn của em đã được gửi ♥<br><br>" + "Cảm ơn em đã chia sẻ với anh điều này! ❤️");
     const subject = encodeURIComponent("Lời nhắn từ em 💌");
-    // emailjs.send("service_qan1yos","template_9ympf9f",{
-    //     name: msg,
-    //     message: msg,
-    //     });
+    emailjs.send("service_qan1yos","template_9ympf9f",{
+        name: msg,
+        message: msg,
+        });
      // Nếu muốn xóa nội dung sau khi gửi:
     document.getElementById('loveMessage').value = "";
   } else {
