@@ -18,7 +18,8 @@
       background: linear-gradient(to bottom, #ffd1dc, #ffe6f0);
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      overflow: hidden;
+      /* overflow: hidden; */
+      overflow-y: auto;
     }
 
     .container {
@@ -140,6 +141,45 @@
 #audio-control:hover {
   transform: scale(1.2);
 }
+
+@media (max-width: 600px) {
+  .container {
+    margin-top: 30px;
+    padding: 0 5px;
+  }
+  .slideshow {
+    max-width: 98vw;
+    padding: 8px;
+    border-radius: 10px;
+  }
+  .slide {
+    border-radius: 8px;
+  }
+  #audio-control {
+    font-size: 24px;
+    top: 10px;
+    right: 10px;
+  }
+  .message {
+    font-size: 16px;
+    min-height: 40px;
+  }
+  textarea {
+    width: 98%;
+    font-size: 15px;
+    padding: 8px;
+  }
+  .final-input p {
+    font-size: 15px !important;
+  }
+  button {
+    font-size: 15px !important;
+    padding: 8px 14px !important;
+  }
+}
+/* Thêm vào cuối thẻ <style> nếu muốn tuỳ chỉnh thêm */
+#custom-popup { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.3); z-index: 2000; align-items: center; justify-content: center; }
+#custom-popup.show { display: flex; }
   </style>
 </head>
 <body>
@@ -166,7 +206,12 @@
       </div>
     </div>
   </div>
-
+<div id="custom-popup" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:24px 18px;border-radius:12px;max-width:90vw;box-shadow:0 2px 16px #d6336c44;text-align:center;">
+    <div id="popup-message" style="color:#d6336c;font-size:18px;margin-bottom:12px;"></div>
+    <button onclick="closePopup()" style="padding:8px 20px;border:none;background:#ff80ab;color:#fff;border-radius:8px;font-size:16px;cursor:pointer;">Đóng</button>
+  </div>
+</div>
 
   <script>
     const images = [
@@ -177,6 +222,15 @@
       'images/love5.jpg',
       'images/love6.jpg'
     ];
+
+    // ...existing code...
+    window.addEventListener('DOMContentLoaded', () => {
+      function firstUserInteract() {
+        audio.play();
+        document.removeEventListener('click', firstUserInteract);
+      }
+      document.addEventListener('click', firstUserInteract);
+    });
 
     const messages = [
       'Anh vẫn nhớ lần đầu gặp em, trái tim anh như ngừng đập.',
@@ -242,16 +296,26 @@
     function sendMessage() {
   const msg = document.getElementById('loveMessage').value.trim();
   if (msg) {
-    alert("Lời nhắn của em đã được gửi ♥\n\n" + msg);
+    showPopup("Lời nhắn của em đã được gửi ♥<br><br>" + "Cảm ơn em đã chia sẻ với anh điều này! ❤️");
     const subject = encodeURIComponent("Lời nhắn từ em 💌");
-    emailjs.send("service_qan1yos","template_9ympf9f",{
-        name: msg,
-        message: msg,
-        });
-    document.getElementById('love-input').innerHTML = `<p style="color:#d6336c;font-size:20px;">Cảm ơn em vì lời nhắn đáng yêu! 💖</p>`;
+    // emailjs.send("service_qan1yos","template_9ympf9f",{
+    //     name: msg,
+    //     message: msg,
+    //     });
+     // Nếu muốn xóa nội dung sau khi gửi:
+    document.getElementById('loveMessage').value = "";
   } else {
-    alert("Em chưa viết gì cả 😢");
+    showPopup("Em chưa viết gì cả 😢");
   }}
+
+  function showPopup(message) {
+  document.getElementById('popup-message').innerHTML = message;
+  document.getElementById('custom-popup').classList.add('show');
+}
+
+function closePopup() {
+  document.getElementById('custom-popup').classList.remove('show');
+}
 
    const audio = document.getElementById("bgm");
   const control = document.getElementById("audio-control");
